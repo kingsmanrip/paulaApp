@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %} - Bulk Import{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-12">
+        <h1>Bulk Import Data</h1>
+        <p class="text-muted">Import clock-in and clock-out data in bulk</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header">Import Data</div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="data" class="form-label">Clock In/Out Data</label>
+                        <textarea class="form-control" id="data" name="data" rows="10" required placeholder="Paste your clock in/out data here..."></textarea>
+                        <div class="form-text mt-2">
+                            <p>Format should match:</p>
+                            <pre>ClockIn- employee: Name1 Name2 Name3
+location: Address
+date: Month DD, YYYY at HH:MM AM/PM
+
+ClockOut- employee: Name1 Name2 Name3
+location: Address
+date: Month DD, YYYY at HH:MM AM/PM</pre>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Import Data</button>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

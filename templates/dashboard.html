@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %} - Dashboard{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-12">
+        <h1>Employee Dashboard</h1>
+        <p class="text-muted">Week of {{ start_of_week.strftime('%B %d, %Y') }} to {{ end_of_week.strftime('%B %d, %Y') }}</p>
+    </div>
+</div>
+
+<div class="row">
+    {% for employee in employees %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>{{ employee.name }}</span>
+                <a href="{{ url_for('employee_detail', employee_id=employee.id) }}" class="btn btn-sm btn-outline-primary">Details</a>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h5 class="mb-2">Today:</h5>
+                    {% set today_hours = calculate_total_hours(employee, today, today) %}
+                    <h3 class="text-primary">{{ today_hours }} hours</h3>
+                </div>
+                <div class="mb-3">
+                    <h5 class="mb-2">This Week:</h5>
+                    {% set week_hours = calculate_total_hours(employee, start_of_week, end_of_week) %}
+                    <h3 class="text-success">{{ week_hours }} hours</h3>
+                </div>
+                <div>
+                    <h5 class="mb-2">Total Hours:</h5>
+                    {% set total_hours = calculate_total_hours(employee) %}
+                    <h3 class="text-info">{{ total_hours }} hours</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">Team Summary</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="summary-card">
+                            <h3>Total Team Hours Today</h3>
+                            {% set team_today_hours = 0 %}
+                            {% for employee in employees %}
+                                {% set today_hours = calculate_total_hours(employee, today, today) %}
+                                {% set team_today_hours = team_today_hours + today_hours %}
+                            {% endfor %}
+                            <div class="number">{{ team_today_hours }} hours</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="summary-card">
+                            <h3>Total Team Hours This Week</h3>
+                            {% set team_week_hours = 0 %}
+                            {% for employee in employees %}
+                                {% set week_hours = calculate_total_hours(employee, start_of_week, end_of_week) %}
+                                {% set team_week_hours = team_week_hours + week_hours %}
+                            {% endfor %}
+                            <div class="number">{{ team_week_hours }} hours</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="summary-card">
+                            <h3>Total Team Members</h3>
+                            <div class="number">{{ employees|length }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

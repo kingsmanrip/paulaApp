@@ -1,0 +1,46 @@
+/* Additional custom styles */
+.page-title {
+    margin-bottom: 20px;
+}
+
+.employee-card:hover {
+    transform: translateY(-3px);
+    transition: transform 0.3s ease;
+}
+
+/* iPhone-friendly responsive design */
+@media (max-width: 576px) {
+    .card {
+        margin-bottom: 15px;
+    }
+    
+    .table {
+        font-size: 0.85rem;
+    }
+    
+    .container {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    
+    .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+}
+
+/* Fix for tables on small screens */
+.table-responsive {
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Make cards more touch-friendly */
+.card-body {
+    padding: 1.25rem;
+}
+
+/* Enhance readability on mobile */
+body {
+    font-size: 16px;
+    line-height: 1.5;
+}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %} - Add Employee{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-12">
+        <h1>Add New Employee</h1>
+        <p class="text-muted">Enter employee details</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-header">New Employee</div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Employee Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                        <div class="form-text">Enter the employee's full name</div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Add Employee</button>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

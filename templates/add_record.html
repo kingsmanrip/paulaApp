@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %} - Add Record{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-12">
+        <h1>Add Time Record</h1>
+        <p class="text-muted">Enter time record details</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header">New Time Record</div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="employee_id" class="form-label">Employee</label>
+                        <select class="form-select" id="employee_id" name="employee_id" required>
+                            <option value="">Select an employee</option>
+                            {% for employee in employees %}
+                            <option value="{{ employee.id }}">{{ employee.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="clock_in_date" class="form-label">Clock In Date</label>
+                            <input type="date" class="form-control" id="clock_in_date" name="clock_in_date" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="clock_in_time" class="form-label">Clock In Time</label>
+                            <input type="time" class="form-control" id="clock_in_time" name="clock_in_time" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="location_in" class="form-label">Clock In Location</label>
+                        <input type="text" class="form-control" id="location_in" name="location_in" required>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="clock_out_date" class="form-label">Clock Out Date</label>
+                            <input type="date" class="form-control" id="clock_out_date" name="clock_out_date">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="clock_out_time" class="form-label">Clock Out Time</label>
+                            <input type="time" class="form-control" id="clock_out_time" name="clock_out_time">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="location_out" class="form-label">Clock Out Location</label>
+                        <input type="text" class="form-control" id="location_out" name="location_out">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Add Record</button>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Automatically set today's date as default
+    document.addEventListener('DOMContentLoaded', function() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('clock_in_date').value = today;
+        document.getElementById('clock_out_date').value = today;
+    });
+</script>
+{% endblock %}
