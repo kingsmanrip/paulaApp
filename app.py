@@ -26,9 +26,18 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+class Squad(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False, unique=True)
+    employees = db.relationship('Employee', backref='squad', lazy=True)
+    
+    def __repr__(self):
+        return f'<Squad {self.name}>'
+
 class Employee(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
+    squad_id = db.Column(db.Integer, db.ForeignKey('squad.id'), nullable=True)
     timerecords = db.relationship('TimeRecord', backref='employee', lazy=True)
     
     def __repr__(self):
@@ -87,6 +96,8 @@ def logout():
 @app.route('/dashboard')
 @login_required
 def dashboard():
+    # Get all squads with employees
+    squads = Squad.query.all()
     employees = Employee.query.all()
     
     # Get date range for current week (Monday to Sunday)
@@ -95,9 +106,11 @@ def dashboard():
     end_of_week = start_of_week + timedelta(days=6)
     
     return render_template('dashboard.html', 
+                          squads=squads,
                           employees=employees,
                           start_of_week=start_of_week,
-                          end_of_week=end_of_week)
+                          end_of_week=end_of_week,
+                          today=today)
 
 @app.route('/employee/<int:employee_id>')
 @login_required

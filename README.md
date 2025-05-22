@@ -1,15 +1,17 @@
 # Employee Tracker
 
-A web-based application for tracking employee attendance, work hours, and locations.
+A web-based application for tracking employee attendance, work hours, and locations with squad organization.
 
 ## Features
 
 - Secure login system
-- Dashboard with individual and team work hour summaries
+- Squad-based organization of employees
+- Dashboard with squad and individual work hour summaries
 - Employee management
 - Time record tracking (clock in/out)
 - Location tracking
 - Daily, weekly, and total hour calculations
+- Squad performance tracking
 - Bulk data import
 - Mobile-friendly responsive design
 
@@ -20,11 +22,24 @@ A web-based application for tracking employee attendance, work hours, and locati
 
 ## How to Use
 
-1. **Dashboard**: View summary of all employees' work hours
-2. **Employee Details**: Click on "Details" for any employee to see their complete work history
-3. **Add Employee**: Add new employees to the system
-4. **Add Record**: Manually add clock in/out records for employees
-5. **Bulk Import**: Paste formatted data to import multiple clock in/out records at once
+1. **Dashboard**: View summary of all squads and employees' work hours
+2. **Squad Overview**: See employees grouped by squads with squad performance metrics
+3. **Employee Details**: Click on "Details" for any employee to see their complete work history
+4. **Add Employee**: Add new employees to the system
+5. **Add Record**: Manually add clock in/out records for employees
+6. **Bulk Import**: Paste formatted data to import multiple clock in/out records at once
+
+## Squad Organization
+
+Employees are organized into squads for better team management:
+
+- **Employee1 Squad**: Core field team including Caleb Bryant, Aaron Mitchell, Seth James, Colton Poore, David Pool, and Shawn Beard
+- **Employee8 Squad**: Secondary team including Jeramy Smith, Johnnie Roberts, Blake Hay, and Maurilio Galvez
+
+Each squad displays:
+- Aggregated squad hours (daily and weekly)
+- Individual employee performance
+- Member count and activity metrics
 
 ## Bulk Import Format
 

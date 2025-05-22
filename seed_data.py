@@ -1,4 +1,4 @@
-from app import app, db, Employee, TimeRecord, User
+from app import app, db, Employee, TimeRecord, User, Squad
 from datetime import datetime
 from werkzeug.security import generate_password_hash
 
@@ -19,7 +19,26 @@ def seed_database():
         # Clear existing data for clean restart
         TimeRecord.query.delete()
         Employee.query.delete()
+        Squad.query.delete()
         db.session.commit()
+        
+        # Create squads
+        squads = [
+            Squad(name="Employee1"),
+            Squad(name="Employee2"),
+            Squad(name="Employee3"),
+            Squad(name="Employee4"),
+            Squad(name="Employee5"),
+            Squad(name="Employee6"),
+            Squad(name="Employee7"),
+            Squad(name="Employee8")
+        ]
+        
+        for squad in squads:
+            db.session.add(squad)
+        
+        db.session.commit()
+        print(f"{len(squads)} squads created")
         
         # List of employees with full names exactly as provided
         employee_names = [
@@ -66,14 +85,47 @@ def seed_database():
             "Rodolfo Coronado"
         ]
         
-        # Add employees to the database
+        # Squad assignments
+        employee1_squad_members = [
+            "Caleb Bryant",
+            "Aaron Mitchell",
+            "Seth James",
+            "Colton Poore",
+            "David Pool",
+            "Shawn Beard"
+        ]
+        
+        employee8_squad_members = [
+            "Jeramy Smith",
+            "Johnnie Roberts",
+            "Blake Hay",
+            "Maurilio Galvez"
+        ]
+        
+        # Get squad references
+        employee1_squad = Squad.query.filter_by(name="Employee1").first()
+        employee8_squad = Squad.query.filter_by(name="Employee8").first()
+        
+        # Add employees to the database with squad assignments
         for name in employee_names:
             if not Employee.query.filter_by(name=name).first():
-                employee = Employee(name=name)
+                squad_id = None
+                
+                # Assign to Employee1 squad
+                if name in employee1_squad_members:
+                    squad_id = employee1_squad.id
+                
+                # Assign to Employee8 squad
+                elif name in employee8_squad_members:
+                    squad_id = employee8_squad.id
+                
+                employee = Employee(name=name, squad_id=squad_id)
                 db.session.add(employee)
         
         db.session.commit()
         print(f"{len(employee_names)} employees added to database")
+        print(f"{len(employee1_squad_members)} employees assigned to Employee1 squad")
+        print(f"{len(employee8_squad_members)} employees assigned to Employee8 squad")
         
         # Add clock in/out records exactly as formatted
         clock_records = [
