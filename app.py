@@ -32,7 +32,9 @@ class User(UserMixin, db.Model):
 class Squad(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False, unique=True)
-    employees = db.relationship('Employee', backref='squad', lazy=True)
+    squad_leader_id = db.Column(db.Integer, db.ForeignKey('employee.id'), nullable=True)
+    employees = db.relationship('Employee', backref='squad', foreign_keys='Employee.squad_id', lazy=True)
+    squad_leader = db.relationship('Employee', foreign_keys=[squad_leader_id], backref='leading_squad', uselist=False, lazy=True, post_update=True)
     
     def __repr__(self):
         return f'<Squad {self.name}>'
@@ -277,91 +279,148 @@ def bulk_import():
     if request.method == 'POST':
         data = request.form.get('data')
         
+        # Parse the multi-line format
+        current_action = None
+        employee_names = ""
+        location = ""
+        date_str = ""
+        
         lines = data.strip().split('\n')
-        for line in lines:
-            line = line.strip()
+        i = 0
+        while i < len(lines):
+            line = lines[i].strip()
+            
+            # Determine record type (ClockIn/ClockOut)
             if line.startswith("ClockIn-"):
-                # Process clock in data
-                parts = line.split('employee: ')[1].split('location: ')
-                employee_names = parts[0].strip()
-                location_parts = parts[1].split('date: ')
-                location = location_parts[0].strip()
-                date_str = location_parts[1].strip()
+                current_action = "ClockIn"
+                i += 1
                 
-                # Parse date
-                try:
-                    date_obj = datetime.strptime(date_str, '%B %d, %Y at %I:%M %p')
-                except ValueError:
-                    flash(f'Error parsing date: {date_str}')
-                    continue
+                # Find employee section
+                while i < len(lines) and not lines[i].strip().startswith("employee:"):
+                    i += 1
                 
-                # Process each employee
-                for emp_name in employee_names.split(' '):
-                    if not emp_name or emp_name in ["and"]:
-                        continue
+                if i < len(lines):  # Found employee section
+                    i += 1  # Move past the "employee:" line
+                    employee_names = ""
                     
-                    # Try to find employee
-                    employee = Employee.query.filter_by(name=emp_name).first()
-                    if not employee:
-                        employee = Employee(name=emp_name)
-                        db.session.add(employee)
-                        db.session.commit()
+                    # Collect all employee names until we hit "location:"
+                    while i < len(lines) and not lines[i].strip().startswith("location:"):
+                        employee_names += lines[i].strip() + " "
+                        i += 1
                     
-                    # Check if there's already a clock-in record for this employee on this date
-                    existing_record = TimeRecord.query.filter(
-                        TimeRecord.employee_id == employee.id,
-                        TimeRecord.clock_in.date() == date_obj.date()
-                    ).first()
-                    
-                    if existing_record:
-                        existing_record.clock_in = date_obj
-                        existing_record.location_in = location
-                    else:
-                        record = TimeRecord(
-                            employee_id=employee.id,
-                            clock_in=date_obj,
-                            location_in=location
-                        )
-                        db.session.add(record)
-                    
-                    db.session.commit()
-                    
+                    if i < len(lines):  # Found location section
+                        i += 1  # Move past the "location:" line
+                        location = ""
+                        
+                        # Collect location until we hit "date:"
+                        while i < len(lines) and not lines[i].strip().startswith("date:"):
+                            location += lines[i].strip() + "\n"
+                            i += 1
+                        
+                        location = location.strip()
+                        
+                        if i < len(lines):  # Found date section
+                            i += 1  # Move past the "date:" line
+                            date_str = lines[i].strip()
+                            
+                            # Process the clock-in record with collected data
+                            try:
+                                date_obj = datetime.strptime(date_str, '%B %d, %Y at %I:%M %p')
+                                
+                                # Process each employee
+                                for emp_name in employee_names.split():
+                                    if not emp_name or emp_name in ["and"]:
+                                        continue
+                                    
+                                    # Try to find employee
+                                    employee = Employee.query.filter_by(name=emp_name).first()
+                                    if not employee:
+                                        continue
+                                    
+                                    # Check if there's already a clock-in record for this employee on this date
+                                    existing_record = TimeRecord.query.filter(
+                                        TimeRecord.employee_id == employee.id,
+                                        TimeRecord.clock_in.date() == date_obj.date()
+                                    ).first()
+                                    
+                                    if existing_record:
+                                        existing_record.clock_in = date_obj
+                                        existing_record.location_in = location
+                                    else:
+                                        record = TimeRecord(
+                                            employee_id=employee.id,
+                                            clock_in=date_obj,
+                                            location_in=location
+                                        )
+                                        db.session.add(record)
+                                    
+                                    db.session.commit()
+                                    
+                            except ValueError as e:
+                                flash(f'Error processing record: {str(e)}')
+                
             elif line.startswith("ClockOut-"):
-                # Process clock out data
-                parts = line.split('employee: ')[1].split('location: ')
-                employee_names = parts[0].strip()
-                location_parts = parts[1].split('date: ')
-                location = location_parts[0].strip()
-                date_str = location_parts[1].strip()
+                current_action = "ClockOut"
+                i += 1
                 
-                # Parse date
-                try:
-                    date_obj = datetime.strptime(date_str, '%B %d, %Y at %I:%M %p')
-                except ValueError:
-                    flash(f'Error parsing date: {date_str}')
-                    continue
+                # Find employee section
+                while i < len(lines) and not lines[i].strip().startswith("employee:"):
+                    i += 1
                 
-                # Process each employee
-                for emp_name in employee_names.split(' '):
-                    if not emp_name or emp_name in ["and"]:
-                        continue
+                if i < len(lines):  # Found employee section
+                    i += 1  # Move past the "employee:" line
+                    employee_names = ""
                     
-                    # Try to find employee
-                    employee = Employee.query.filter_by(name=emp_name).first()
-                    if not employee:
-                        continue
+                    # Collect all employee names until we hit "location:"
+                    while i < len(lines) and not lines[i].strip().startswith("location:"):
+                        employee_names += lines[i].strip() + " "
+                        i += 1
                     
-                    # Find the most recent clock-in record without a clock-out
-                    record = TimeRecord.query.filter(
-                        TimeRecord.employee_id == employee.id,
-                        TimeRecord.clock_in.date() == date_obj.date(),
-                        TimeRecord.clock_out == None
-                    ).first()
-                    
-                    if record:
-                        record.clock_out = date_obj
-                        record.location_out = location
-                        db.session.commit()
+                    if i < len(lines):  # Found location section
+                        i += 1  # Move past the "location:" line
+                        location = ""
+                        
+                        # Collect location until we hit "date:"
+                        while i < len(lines) and not lines[i].strip().startswith("date:"):
+                            location += lines[i].strip() + "\n"
+                            i += 1
+                        
+                        location = location.strip()
+                        
+                        if i < len(lines):  # Found date section
+                            i += 1  # Move past the "date:" line
+                            date_str = lines[i].strip()
+                            
+                            # Process the clock-out record with collected data
+                            try:
+                                date_obj = datetime.strptime(date_str, '%B %d, %Y at %I:%M %p')
+                                
+                                # Process each employee
+                                for emp_name in employee_names.split():
+                                    if not emp_name or emp_name in ["and"]:
+                                        continue
+                                    
+                                    # Try to find employee
+                                    employee = Employee.query.filter_by(name=emp_name).first()
+                                    if not employee:
+                                        continue
+                                    
+                                    # Find the most recent clock-in record without a clock-out
+                                    record = TimeRecord.query.filter(
+                                        TimeRecord.employee_id == employee.id,
+                                        TimeRecord.clock_in.date() == date_obj.date(),
+                                        TimeRecord.clock_out == None
+                                    ).first()
+                                    
+                                    if record:
+                                        record.clock_out = date_obj
+                                        record.location_out = location
+                                        db.session.commit()
+                                    
+                            except ValueError as e:
+                                flash(f'Error processing record: {str(e)}')
+            else:
+                i += 1
         
         flash('Data imported successfully!')
         return redirect(url_for('dashboard'))
@@ -369,18 +428,35 @@ def bulk_import():
     return render_template('bulk_import.html')
 
 def calculate_total_hours(employee, start_date=None, end_date=None):
-    query = TimeRecord.query.filter_by(employee_id=employee.id)
+    """Calculate total hours worked by an employee within a date range"""
+    # Import text function from SQLAlchemy
+    from sqlalchemy import text
+    
+    # Base query
+    sql_query = """
+    SELECT ROUND(SUM((julianday(clock_out) - julianday(clock_in)) * 24), 2) as total_hours
+    FROM time_record 
+    WHERE employee_id = :employee_id AND clock_out IS NOT NULL
+    """
+    
+    # Parameters dictionary
+    params = {"employee_id": employee.id}
     
     if start_date:
-        query = query.filter(TimeRecord.clock_in >= datetime.combine(start_date, datetime.min.time()))
-    
+        sql_query += " AND date(clock_in) >= date(:start_date)"
+        params["start_date"] = start_date.strftime('%Y-%m-%d')
+        
     if end_date:
-        query = query.filter(TimeRecord.clock_in <= datetime.combine(end_date, datetime.max.time()))
+        sql_query += " AND date(clock_in) <= date(:end_date)"
+        params["end_date"] = end_date.strftime('%Y-%m-%d')
     
-    records = query.all()
-    total_hours = sum(record.hours_worked() for record in records)
+    # Execute with proper text() function
+    result = db.session.execute(text(sql_query), params).fetchone()
     
-    return round(total_hours, 2)
+    # Handle None result (no hours worked)
+    if result and result[0] is not None:
+        return result[0]
+    return 0.0
 
 def get_latest_workday(employee=None):
     """Get the most recent day that has time records"""
@@ -388,7 +464,8 @@ def get_latest_workday(employee=None):
     if employee:
         query = query.filter_by(employee_id=employee.id)
     
-    latest_record = query.order_by(TimeRecord.clock_in.desc()).first()
+    # Find the latest record that has a clock_out time (completed record)
+    latest_record = query.filter(TimeRecord.clock_out.isnot(None)).order_by(TimeRecord.clock_in.desc()).first()
     if latest_record:
         return latest_record.clock_in.date()
     return datetime.today().date()
@@ -604,6 +681,51 @@ def analytics():
     # Get top 5 locations
     top_locations = dict(sorted(location_data.items(), key=lambda x: x[1], reverse=True)[:5])
     
+    # Generate insights for analytics page
+    insights = []
+    
+    # Add top squad insight
+    if top_squad:
+        insights.append(f"Top performing squad: {top_squad.name} with {squad_hours[top_squad_id]:.1f} hours")
+    
+    # Find employees with no recent activity (7 days)
+    inactive_employees = []
+    week_ago = today - timedelta(days=7)
+    
+    for employee in employees:
+        recent_record = TimeRecord.query.filter(
+            TimeRecord.employee_id == employee.id,
+            TimeRecord.clock_in >= datetime.combine(week_ago, datetime.min.time())
+        ).first()
+        
+        if not recent_record:
+            inactive_employees.append(employee.name)
+    
+    if inactive_employees:
+        insights.append(f"Employees with no activity in the last week: {', '.join(inactive_employees)}")
+    
+    # Add underperforming employees insight
+    underperforming_names = [f"{e.name} ({employee_avg_hours[e.id]:.1f} hrs/day)" for e in underperforming_employees[:3]]
+    if underperforming_names:
+        insights.append(f"Underperforming employees (< 8hrs/day): {', '.join(underperforming_names)}" + 
+                      (" and others" if len(underperforming_employees) > 3 else ""))
+    
+    # Detect unusual patterns
+    unusual_patterns = []
+    for employee in employees:
+        records = TimeRecord.query.filter(
+            TimeRecord.employee_id == employee.id,
+            TimeRecord.clock_in >= datetime.combine(week_ago, datetime.min.time())
+        ).all()
+        
+        for record in records:
+            if record.clock_out and record.hours_worked() > 12:
+                unusual_patterns.append(f"{employee.name} worked {record.hours_worked():.1f} hours on {record.clock_in.strftime('%Y-%m-%d')}")
+    
+    if unusual_patterns:
+        insights.append(f"Unusual work patterns detected: {unusual_patterns[0]}" + 
+                      (" and others" if len(unusual_patterns) > 1 else ""))
+    
     return render_template('analytics.html',
         daily_hours=daily_hours,
         squad_hours=dict(squad_hours),
@@ -617,8 +739,26 @@ def analytics():
         underperforming_count=underperforming_count,
         underperforming_employees=underperforming_employees,
         employee_count=len(employees),
-        squads=squads
+        squads=squads,
+        insights=insights
     )
+
+# Route to handle squad leader assignment
+@app.route('/assign_squad_leader/<int:squad_id>', methods=['GET', 'POST'])
+@login_required
+def assign_squad_leader(squad_id):
+    squad = Squad.query.get_or_404(squad_id)
+    squad_employees = Employee.query.filter_by(squad_id=squad_id).all()
+    
+    if request.method == 'POST':
+        leader_id = request.form.get('leader_id')
+        if leader_id:
+            squad.squad_leader_id = leader_id
+            db.session.commit()
+            flash(f'Squad leader assigned successfully!', 'success')
+            return redirect(url_for('dashboard'))
+    
+    return render_template('assign_squad_leader.html', squad=squad, employees=squad_employees)
 
 app.jinja_env.globals.update(calculate_total_hours=calculate_total_hours)
 

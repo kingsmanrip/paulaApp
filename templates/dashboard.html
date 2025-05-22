@@ -10,27 +10,24 @@
     </div>
 </div>
 
-{% if insights %}
-<div class="row mt-3">
-    <div class="col-12">
-        <div class="card border-left-info">
-            <div class="card-body">
-                <h5 class="card-title"><i class="fas fa-lightbulb text-info"></i> Insights</h5>
-                <ul class="mb-0">
-                    {% for insight in insights %}
-                    <li>{{ insight }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
+<!-- Insights section moved to analytics page -->
 
 {% for squad in squads %}
 <div class="row mt-4">
     <div class="col-12">
-        <h2 class="squad-name">{{ squad.name }}</h2>
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="squad-name">{{ squad.name }}</h2>
+                {% if squad.squad_leader %}
+                <p class="text-muted mb-0">Squad Leader: {{ squad.squad_leader.name }}</p>
+                {% endif %}
+            </div>
+            <div>
+                <a href="{{ url_for('assign_squad_leader', squad_id=squad.id) }}" class="btn btn-sm btn-outline-primary">
+                    {% if squad.squad_leader %}Change Squad Leader{% else %}Assign Squad Leader{% endif %}
+                </a>
+            </div>
+        </div>
         <hr class="squad-divider">
     </div>
 </div>
@@ -65,45 +62,7 @@
     {% endfor %}
 </div>
 
-<div class="row mt-3 mb-4">
-    <div class="col-12">
-        <div class="card squad-summary-card">
-            <div class="card-body">
-                <h4>{{ squad.name }} Summary</h4>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="summary-data">
-                            <span class="summary-label">{% if latest_workday == today %}Today's Hours{% else %}Latest Day ({{ latest_workday.strftime('%m/%d') }}){% endif %}:</span>
-                            {% set squad_today_hours = 0 %}
-                            {% for employee in squad.employees %}
-                                {% set today_hours = calculate_total_hours(employee, latest_workday, latest_workday) %}
-                                {% set squad_today_hours = squad_today_hours + today_hours %}
-                            {% endfor %}
-                            <span class="summary-value">{{ squad_today_hours }} hours</span>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="summary-data">
-                            <span class="summary-label">Weekly Hours:</span>
-                            {% set squad_week_hours = 0 %}
-                            {% for employee in squad.employees %}
-                                {% set week_hours = calculate_total_hours(employee, start_of_week, end_of_week) %}
-                                {% set squad_week_hours = squad_week_hours + week_hours %}
-                            {% endfor %}
-                            <span class="summary-value">{{ squad_week_hours }} hours</span>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="summary-data">
-                            <span class="summary-label">Team Members:</span>
-                            <span class="summary-value">{{ squad.employees|length }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+
 {% endfor %}
 
 <!-- Unassigned employees section (if any) -->
@@ -147,49 +106,5 @@
 </div>
 {% endif %}
 
-<div class="row mt-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">Company Summary</div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="summary-card">
-                            <h3>{% if latest_workday == today %}Today's Hours{% else %}Latest Day ({{ latest_workday.strftime('%m/%d') }}){% endif %}</h3>
-                            {% set team_today_hours = 0 %}
-                            {% for employee in employees %}
-                                {% set today_hours = calculate_total_hours(employee, latest_workday, latest_workday) %}
-                                {% set team_today_hours = team_today_hours + today_hours %}
-                            {% endfor %}
-                            <div class="number">{{ team_today_hours }} hours</div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="summary-card">
-                            <h3>Total Hours This Week</h3>
-                            {% set team_week_hours = 0 %}
-                            {% for employee in employees %}
-                                {% set week_hours = calculate_total_hours(employee, start_of_week, end_of_week) %}
-                                {% set team_week_hours = team_week_hours + week_hours %}
-                            {% endfor %}
-                            <div class="number">{{ team_week_hours }} hours</div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="summary-card">
-                            <h3>Active Squads</h3>
-                            <div class="number">{{ squads|length }}</div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="summary-card">
-                            <h3>Total Employees</h3>
-                            <div class="number">{{ employees|length }}</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Company Summary section removed as requested -->
 {% endblock %}

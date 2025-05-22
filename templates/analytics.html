@@ -81,6 +81,26 @@
     </div>
 </div>
 
+<!-- Insights Section -->
+{% if insights %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-info"><i class="fas fa-lightbulb"></i> Performance Insights</h6>
+            </div>
+            <div class="card-body">
+                <ul class="mb-0">
+                    {% for insight in insights %}
+                    <li class="mb-2">{{ insight }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <!-- Productivity Trends Chart -->
 <div class="row mt-4">
     <div class="col-12">

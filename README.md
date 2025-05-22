@@ -5,17 +5,17 @@ A comprehensive web-based application for tracking employee attendance, work hou
 ## Features
 
 - Secure login system with ALPHA CONTRACTING branding
-- Squad-based organization of employees
-- Dashboard with squad and individual work hour summaries
-- Automated performance insights with underperforming employee detection
+- Squad-based organization of employees with squad leaders
+- Clean dashboard showing employee work performance
+- Performance insights section on the analytics page
 - PDF report generation with customizable date ranges
-- Analytics dashboard with visualizations and performance metrics
-- Employee management
+- Advanced analytics dashboard with visualizations and performance metrics
+- Employee management and assignment
 - Time record tracking (clock in/out)
 - Location tracking and distribution analytics
 - Daily, weekly, and total hour calculations
 - Squad performance tracking and comparisons
-- Bulk data import
+- Bulk data import with multi-line format support
 - Mobile-friendly responsive design
 
 ## Login Credentials
@@ -25,26 +25,55 @@ A comprehensive web-based application for tracking employee attendance, work hou
 
 ## How to Use
 
-1. **Dashboard**: View summary of all squads and employees' work hours with automated insights
-2. **Squad Overview**: See employees grouped by squads with squad performance metrics
-3. **Employee Details**: Click on "Details" for any employee to see their complete work history
-4. **Add Employee**: Add new employees to the system
-5. **Add Record**: Manually add clock in/out records for employees
-6. **Bulk Import**: Paste formatted data to import multiple clock in/out records at once
-7. **Reports**: Generate PDF reports of employee hours for specific date ranges
-8. **Analytics**: Access the analytics dashboard for visual performance metrics
+1. **Dashboard**: View squads and employees' work hours with assigned squad leaders
+2. **Squad Overview**: See employees grouped by squads with phone numbers
+3. **Squad Leader Management**: Assign or change squad leaders using the button next to each squad name
+4. **Employee Details**: Click on "Details" for any employee to see their complete work history
+5. **Add Employee**: Add new employees to the system
+6. **Add Record**: Manually add clock in/out records for employees
+7. **Bulk Import**: Paste formatted data to import multiple clock in/out records at once
+8. **Reports**: Generate PDF reports of employee hours for specific date ranges
+9. **Analytics**: Access the analytics dashboard for visual performance metrics and insights
 
 ## Squad Organization
 
-Employees are organized into squads for better team management:
+Employees are organized into squads for better team management, with each squad identified by a phone number:
 
-- **Employee1 Squad**: Core field team including Caleb Bryant, Aaron Mitchell, Seth James, Colton Poore, David Pool, and Shawn Beard
-- **Employee8 Squad**: Secondary team including Jeramy Smith, Johnnie Roberts, Blake Hay, and Maurilio Galvez
+- **Employee1 (601-434-7661)**: Core field team including Caleb Bryant, Aaron Mitchell, Seth James, Colton Poore, David Pool, and Shawn Beard
+- **Employee2 (601-610-2935)**: Team members assigned to this squad
+- **Employee3 (601-610-2936)**: Team members assigned to this squad
+- **Employee4 (601-610-2933)**: Team members assigned to this squad
+- **Employee5 (601-610-2937)**: Team members assigned to this squad
+- **Employee6 (601-610-2938)**: Team members assigned to this squad
+- **Employee7 (601-610-2931)**: Team members assigned to this squad
+- **Employee8 (601-610-2944)**: Secondary team including Jeramy Smith, Johnnie Roberts, Blake Hay, and Maurilio Galvez
 
-Each squad displays:
-- Aggregated squad hours (daily and weekly)
-- Individual employee performance
-- Member count and activity metrics
+### Squad Leadership
+
+Each squad can have an assigned squad leader:
+- Squad leaders are selected from members of that squad
+- Leaders can be assigned or changed through the dashboard interface
+- The squad leader's name appears under the squad name on the dashboard
+
+### Employee Performance Tracking
+
+Each employee card displays:
+- Latest day's hours
+- Weekly hours
+- Total hours worked
+- Access to detailed performance history
+
+## Analytics and Insights
+
+The Analytics page provides comprehensive performance metrics and visualizations:
+
+- **Performance Insights**: Automated analysis highlighting top-performing squads, underperforming employees, inactive employees, and unusual work patterns
+- **Productivity Trends**: Daily hours chart showing work patterns over time
+- **Squad Performance**: Comparative analysis of squad productivity
+- **Location Distribution**: Map of employee activity locations
+- **Top Performers**: List of employees with highest average hours
+
+Insights are automatically generated based on employee data and provide actionable intelligence for management decisions.
 
 ## Bulk Import Format
 

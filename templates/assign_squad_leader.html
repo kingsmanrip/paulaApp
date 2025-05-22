@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %} - Assign Squad Leader{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-12">
+        <h1>Assign Squad Leader</h1>
+        <p class="text-muted">Select a squad leader for {{ squad.name }}</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <strong>{{ squad.name }}</strong> - Select Squad Leader
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="leader_id" class="form-label">Squad Leader</label>
+                        <select class="form-select" id="leader_id" name="leader_id" required>
+                            <option value="">Select Squad Leader</option>
+                            {% for employee in employees %}
+                            <option value="{{ employee.id }}" {% if squad.squad_leader_id == employee.id %}selected{% endif %}>
+                                {{ employee.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Assign Leader</button>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
