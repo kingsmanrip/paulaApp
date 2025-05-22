@@ -1,9 +1,12 @@
-from flask import Flask, render_template, redirect, url_for, request, flash
+from flask import Flask, render_template, redirect, url_for, request, flash, make_response
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
+from flask_weasyprint import HTML, render_pdf
 import os
+import io
+from collections import defaultdict
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'employee-tracker-secret-key'
@@ -96,21 +99,93 @@ def logout():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    # Get all squads with employees
-    squads = Squad.query.all()
     employees = Employee.query.all()
+    squads = Squad.query.all()
+    today = datetime.now().date()
     
     # Get date range for current week (Monday to Sunday)
-    today = datetime.today().date()
     start_of_week = today - timedelta(days=today.weekday())
     end_of_week = start_of_week + timedelta(days=6)
     
+    # Get the latest day with time records
+    latest_workday = get_latest_workday()
+    
+    # Generate insights
+    insights = []
+    
+    # Find top performing squad
+    squad_hours = {}
+    for squad in squads:
+        total_hours = sum(calculate_total_hours(employee) for employee in squad.employees)
+        squad_hours[squad.id] = total_hours
+    
+    if squad_hours:
+        top_squad_id = max(squad_hours, key=squad_hours.get) if squad_hours else None
+        if top_squad_id:
+            top_squad = Squad.query.get(top_squad_id)
+            insights.append(f"Top performing squad: {top_squad.name} with {squad_hours[top_squad_id]:.1f} hours")
+    
+    # Find employees with no recent activity (7 days)
+    inactive_employees = []
+    week_ago = today - timedelta(days=7)
+    
+    for employee in employees:
+        recent_record = TimeRecord.query.filter(
+            TimeRecord.employee_id == employee.id,
+            TimeRecord.clock_in >= datetime.combine(week_ago, datetime.min.time())
+        ).first()
+        
+        if not recent_record:
+            inactive_employees.append(employee.name)
+    
+    if inactive_employees:
+        insights.append(f"Employees with no activity in the last week: {', '.join(inactive_employees)}")
+    
+    # Find underperforming employees (avg < 8 hours per day)
+    underperforming = []
+    for employee in employees:
+        records = TimeRecord.query.filter(
+            TimeRecord.employee_id == employee.id,
+            TimeRecord.clock_in >= datetime.combine(week_ago, datetime.min.time())
+        ).all()
+        
+        if records:
+            total_hours = sum(record.hours_worked() for record in records if record.clock_out)
+            unique_days = len(set(record.clock_in.date() for record in records))
+            avg_hours = total_hours / unique_days if unique_days > 0 else 0
+            
+            if avg_hours < 8 and avg_hours > 0:
+                underperforming.append(f"{employee.name} ({avg_hours:.1f} hrs/day)")
+    
+    if underperforming:
+        insights.append(f"Underperforming employees (< 8hrs/day): {', '.join(underperforming[:3])}" + 
+                       (" and others" if len(underperforming) > 3 else ""))
+    
+    # Detect unusual patterns
+    unusual_patterns = []
+    for employee in employees:
+        records = TimeRecord.query.filter(
+            TimeRecord.employee_id == employee.id,
+            TimeRecord.clock_in >= datetime.combine(week_ago, datetime.min.time())
+        ).all()
+        
+        for record in records:
+            if record.clock_out and record.hours_worked() > 12:
+                unusual_patterns.append(f"{employee.name} worked {record.hours_worked():.1f} hours on {record.clock_in.strftime('%Y-%m-%d')}")
+    
+    if unusual_patterns:
+        insights.append(f"Unusual work patterns detected: {unusual_patterns[0]}" + 
+                       (" and others" if len(unusual_patterns) > 1 else ""))
+    
     return render_template('dashboard.html', 
+                          employees=employees, 
+                          calculate_total_hours=calculate_total_hours,
+                          today=today, 
                           squads=squads,
-                          employees=employees,
+                          insights=insights,
+                          latest_workday=latest_workday,
                           start_of_week=start_of_week,
-                          end_of_week=end_of_week,
-                          today=today)
+                          end_of_week=end_of_week)
 
 @app.route('/employee/<int:employee_id>')
 @login_required
@@ -307,11 +382,243 @@ def calculate_total_hours(employee, start_date=None, end_date=None):
     
     return round(total_hours, 2)
 
+def get_latest_workday(employee=None):
+    """Get the most recent day that has time records"""
+    query = TimeRecord.query
+    if employee:
+        query = query.filter_by(employee_id=employee.id)
+    
+    latest_record = query.order_by(TimeRecord.clock_in.desc()).first()
+    if latest_record:
+        return latest_record.clock_in.date()
+    return datetime.today().date()
+
 @app.template_filter('format_datetime')
 def format_datetime(value, format='%Y-%m-%d %I:%M %p'):
     if value:
         return value.strftime(format)
     return ""
+
+@app.route('/reports')
+@login_required
+def reports():
+    squads = Squad.query.all()
+    employees = Employee.query.all()
+    return render_template('reports.html', squads=squads, employees=employees)
+
+@app.route('/generate_pdf', methods=['POST'])
+@login_required
+def generate_pdf():
+    # Get form data
+    start_date_str = request.form.get('start_date')
+    end_date_str = request.form.get('end_date')
+    report_type = request.form.get('report_type')
+    report_format = request.form.get('report_format')
+    squad_id = request.form.get('squad_id')
+    employee_id = request.form.get('employee_id')
+    report_title = request.form.get('report_title')
+    
+    # Parse dates
+    start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+    end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+    
+    # Use default title if none provided
+    if not report_title:
+        if report_type == 'all':
+            report_title = 'All Employees Hours Report'
+        elif report_type == 'squad':
+            squad = Squad.query.get(squad_id)
+            report_title = f'{squad.name} Squad Hours Report' if squad else 'Squad Hours Report'
+        else:
+            employee = Employee.query.get(employee_id)
+            report_title = f'{employee.name} Hours Report' if employee else 'Employee Hours Report'
+    
+    # Get data based on report type
+    squads = []
+    single_employee = None
+    
+    if report_type == 'all':
+        squads = Squad.query.all()
+    elif report_type == 'squad' and squad_id:
+        squad = Squad.query.get(squad_id)
+        if squad:
+            squads = [squad]
+    elif report_type == 'employee' and employee_id:
+        single_employee = Employee.query.get(employee_id)
+    
+    # Get all relevant employees
+    employees = []
+    if report_type == 'all' or report_type == 'squad':
+        for squad in squads:
+            employees.extend(squad.employees)
+    elif single_employee:
+        employees = [single_employee]
+    
+    # Prepare data structures for report
+    employee_records = {}
+    employee_totals = {}
+    squad_totals = defaultdict(float)
+    total_hours = 0
+    
+    # Get time records for each employee in the date range
+    for employee in employees:
+        # Filter records by date range
+        records = TimeRecord.query.filter(
+            TimeRecord.employee_id == employee.id,
+            TimeRecord.clock_in >= datetime.combine(start_date, datetime.min.time()),
+            TimeRecord.clock_in <= datetime.combine(end_date, datetime.max.time())
+        ).order_by(TimeRecord.clock_in).all()
+        
+        # Store records for this employee
+        employee_records[employee.id] = records
+        
+        # Calculate totals for this employee
+        hours = sum(record.hours_worked() for record in records)
+        unique_days = len(set(record.clock_in.date() for record in records))
+        
+        employee_totals[employee.id] = {
+            'hours': round(hours, 2),
+            'days': unique_days
+        }
+        
+        # Add to squad total if applicable
+        if employee.squad_id:
+            squad_totals[employee.squad_id] += hours
+        
+        # Add to overall total
+        total_hours += hours
+    
+    # Round squad totals
+    for squad_id in squad_totals:
+        squad_totals[squad_id] = round(squad_totals[squad_id], 2)
+    
+    # Get squad name if single squad
+    squad_name = None
+    if report_type == 'squad' and squads:
+        squad_name = squads[0].name
+    elif single_employee and single_employee.squad:
+        squad_name = single_employee.squad.name
+    
+    # Render PDF template
+    html = render_template(
+        'pdf_report.html',
+        title=report_title,
+        start_date=start_date,
+        end_date=end_date,
+        report_type=report_type,
+        report_format=report_format,
+        squads=squads,
+        single_employee=single_employee,
+        employee_records=employee_records,
+        employee_totals=employee_totals,
+        squad_totals=squad_totals,
+        total_hours=round(total_hours, 2),
+        employees_count=len(employees),
+        squad_name=squad_name,
+        now=datetime.now()
+    )
+    
+    # Generate PDF
+    return render_pdf(HTML(string=html))
+
+@app.route('/analytics')
+@login_required
+def analytics():
+    # Get all employees and squads
+    employees = Employee.query.all()
+    squads = Squad.query.all()
+    
+    # Calculate data for charts
+    daily_hours = defaultdict(float)
+    squad_hours = defaultdict(float)
+    location_data = defaultdict(int)
+    employee_avg_hours = {}
+    employee_last_active = {}
+    
+    # Get date ranges
+    today = datetime.now().date()
+    thirty_days_ago = today - timedelta(days=30)
+    
+    # Track total hours and active days
+    total_hours_all_time = 0
+    active_days = set()
+    
+    # Process all time records
+    time_records = TimeRecord.query.all()
+    for record in time_records:
+        if record.clock_out:
+            hours = record.hours_worked()
+            total_hours_all_time += hours
+            
+            # Only include last 30 days in daily chart
+            if record.clock_in.date() >= thirty_days_ago:
+                day = record.clock_in.strftime('%Y-%m-%d')
+                daily_hours[day] += hours
+                active_days.add(day)
+            
+            employee = Employee.query.get(record.employee_id)
+            
+            # Update last active date for employee
+            if employee.id not in employee_last_active or record.clock_in > datetime.strptime(employee_last_active[employee.id], '%Y-%m-%d'):
+                employee_last_active[employee.id] = record.clock_in.strftime('%Y-%m-%d')
+            
+            if employee and employee.squad_id:
+                squad_hours[employee.squad_id] += hours
+            
+            if record.location_in:
+                location = record.location_in.split('\n')[0] if '\n' in record.location_in else record.location_in
+                location_data[location] += 1
+    
+    # Calculate average daily hours
+    avg_daily_hours = round(total_hours_all_time / len(active_days), 2) if active_days else 0
+    
+    # Calculate employee average hours per day
+    for employee in employees:
+        records = TimeRecord.query.filter_by(employee_id=employee.id).all()
+        if records:
+            total_hours = sum(record.hours_worked() for record in records if record.clock_out)
+            unique_days = len(set(record.clock_in.date() for record in records))
+            avg_hours = round(total_hours / unique_days, 2) if unique_days > 0 else 0
+            employee_avg_hours[employee.id] = avg_hours
+        else:
+            employee_avg_hours[employee.id] = 0
+            employee_last_active[employee.id] = 'Never'
+    
+    # Sort squad hours to find top squad
+    top_squad = None
+    if squad_hours:
+        top_squad_id = max(squad_hours, key=squad_hours.get)
+        top_squad = Squad.query.get(top_squad_id)
+    
+    # Sort employees by average hours
+    sorted_employees = sorted(employees, key=lambda e: employee_avg_hours.get(e.id, 0), reverse=True)
+    top_employees = sorted_employees[:10]  # Top 10 employees
+    
+    # Find underperforming employees (< 8 hours/day)
+    underperforming_employees = [e for e in employees if employee_avg_hours.get(e.id, 0) > 0 and employee_avg_hours.get(e.id, 0) < 8]
+    underperforming_count = len(underperforming_employees)
+    
+    # Sort daily hours chronologically
+    daily_hours = dict(sorted(daily_hours.items()))
+    
+    # Get top 5 locations
+    top_locations = dict(sorted(location_data.items(), key=lambda x: x[1], reverse=True)[:5])
+    
+    return render_template('analytics.html',
+        daily_hours=daily_hours,
+        squad_hours=dict(squad_hours),
+        location_data=top_locations,
+        top_employees=top_employees,
+        employee_avg_hours=employee_avg_hours,
+        employee_last_active=employee_last_active,
+        total_hours_all_time=round(total_hours_all_time, 2),
+        avg_daily_hours=avg_daily_hours,
+        top_squad=top_squad,
+        underperforming_count=underperforming_count,
+        underperforming_employees=underperforming_employees,
+        employee_count=len(employees),
+        squads=squads
+    )
 
 app.jinja_env.globals.update(calculate_total_hours=calculate_total_hours)
 

@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %} - Generate Reports{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-12">
+        <h1>Generate PDF Reports</h1>
+        <p class="text-muted">Select date range and options for employee hours reports</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header">Report Options</div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('generate_pdf') }}" target="_blank">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="start_date" class="form-label">Start Date</label>
+                            <input type="date" class="form-control" id="start_date" name="start_date" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="end_date" class="form-label">End Date</label>
+                            <input type="date" class="form-control" id="end_date" name="end_date" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Report Type</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="report_type" id="report_type_all" value="all" checked>
+                            <label class="form-check-label" for="report_type_all">
+                                All Employees
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="report_type" id="report_type_squad" value="squad">
+                            <label class="form-check-label" for="report_type_squad">
+                                By Squad
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="report_type" id="report_type_employee" value="employee">
+                            <label class="form-check-label" for="report_type_employee">
+                                Single Employee
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3" id="squad_selection" style="display: none;">
+                        <label for="squad_id" class="form-label">Select Squad</label>
+                        <select class="form-select" id="squad_id" name="squad_id">
+                            <option value="">-- Select Squad --</option>
+                            {% for squad in squads %}
+                            <option value="{{ squad.id }}">{{ squad.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3" id="employee_selection" style="display: none;">
+                        <label for="employee_id" class="form-label">Select Employee</label>
+                        <select class="form-select" id="employee_id" name="employee_id">
+                            <option value="">-- Select Employee --</option>
+                            {% for employee in employees %}
+                            <option value="{{ employee.id }}">{{ employee.name }}{% if employee.squad %} ({{ employee.squad.name }}){% endif %}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Report Format</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="report_format" id="report_format_detailed" value="detailed" checked>
+                            <label class="form-check-label" for="report_format_detailed">
+                                Detailed (Show all clock in/out times)
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="report_format" id="report_format_summary" value="summary">
+                            <label class="form-check-label" for="report_format_summary">
+                                Summary (Show daily totals only)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="report_title" class="form-label">Report Title (Optional)</label>
+                        <input type="text" class="form-control" id="report_title" name="report_title" placeholder="Employee Hours Report">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Generate PDF Report</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set default dates (current month)
+        const today = new Date();
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+        const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        
+        document.getElementById('start_date').value = firstDay.toISOString().split('T')[0];
+        document.getElementById('end_date').value = lastDay.toISOString().split('T')[0];
+        
+        // Show/hide squad and employee selection based on report type
+        const reportTypeRadios = document.querySelectorAll('input[name="report_type"]');
+        const squadSelection = document.getElementById('squad_selection');
+        const employeeSelection = document.getElementById('employee_selection');
+        
+        reportTypeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.value === 'squad') {
+                    squadSelection.style.display = 'block';
+                    employeeSelection.style.display = 'none';
+                } else if (this.value === 'employee') {
+                    squadSelection.style.display = 'none';
+                    employeeSelection.style.display = 'block';
+                } else {
+                    squadSelection.style.display = 'none';
+                    employeeSelection.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

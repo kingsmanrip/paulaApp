@@ -4,23 +4,57 @@
 
 {% block content %}
 <div class="row justify-content-center mt-5">
-    <div class="col-md-6 col-lg-4">
-        <div class="card">
-            <div class="card-header">Login</div>
-            <div class="card-body">
+    <div class="col-md-6">
+        <div class="text-center mb-4">
+            <h1 class="company-name">ALPHA CONTRACTING</h1>
+            <p class="text-muted">Employee Tracking System</p>
+        </div>
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-user-lock me-2"></i> Secure Login
+            </div>
+            <div class="card-body p-4">
                 <form method="POST">
-                    <div class="mb-3">
+                    <div class="mb-4">
                         <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" required>
+                        </div>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-4">
                         <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                    <button type="submit" class="btn btn-primary w-100 py-2">Sign In</button>
                 </form>
             </div>
         </div>
+
     </div>
 </div>
+
+<style>
+    .company-name {
+        font-weight: 700;
+        color: #2c3e50;
+        letter-spacing: 1px;
+    }
+    .card {
+        border: none;
+        border-radius: 10px;
+    }
+    .card-header {
+        border-radius: 10px 10px 0 0 !important;
+        font-weight: 600;
+    }
+    .btn-primary {
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+</style>
 {% endblock %}
+

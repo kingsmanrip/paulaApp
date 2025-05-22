@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{ title }}</title>
+    <style>
+        @page {
+            size: letter portrait;
+            margin: 1cm;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.5;
+            color: #333;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .header h1 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 24px;
+        }
+        .header .date-range {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section-title {
+            background-color: #f8f9fa;
+            padding: 5px 10px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            border-left: 4px solid #3498db;
+        }
+        .squad-title {
+            color: #2c3e50;
+            font-weight: bold;
+            font-size: 16px;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table.summary-table {
+            width: 100%;
+            margin-bottom: 30px;
+        }
+        th {
+            background-color: #f0f2f5;
+            text-align: left;
+            padding: 8px;
+            border: 1px solid #ddd;
+            font-weight: bold;
+        }
+        td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 10px;
+            color: #7f8c8d;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+        .total-row {
+            font-weight: bold;
+            background-color: #f0f2f5;
+        }
+        .summary-box {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        .summary-value {
+            font-weight: bold;
+            color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{{ title }}</h1>
+        <div class="date-range">{{ start_date.strftime('%B %d, %Y') }} to {{ end_date.strftime('%B %d, %Y') }}</div>
+    </div>
+
+    <div class="summary-box">
+        <strong>Report Summary:</strong>
+        <ul>
+            <li>Total Hours: <span class="summary-value">{{ total_hours }}</span></li>
+            <li>Days Covered: <span class="summary-value">{{ (end_date - start_date).days + 1 }}</span></li>
+            <li>Employees: <span class="summary-value">{{ employees_count }}</span></li>
+            {% if squad_name %}
+            <li>Squad: <span class="summary-value">{{ squad_name }}</span></li>
+            {% endif %}
+        </ul>
+    </div>
+
+    {% if report_type == 'all' or report_type == 'squad' %}
+        {% for squad in squads %}
+            <div class="section">
+                <div class="squad-title">{{ squad.name }} Squad</div>
+                
+                <div class="summary-box">
+                    <strong>Squad Summary:</strong>
+                    <ul>
+                        <li>Total Squad Hours: <span class="summary-value">{{ squad_totals[squad.id] }}</span></li>
+                        <li>Team Members: <span class="summary-value">{{ squad.employees|length }}</span></li>
+                        <li>Average Hours Per Member: <span class="summary-value">{{ "%.2f"|format(squad_totals[squad.id] / squad.employees|length if squad.employees|length > 0 else 0) }}</span></li>
+                    </ul>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>Total Hours</th>
+                            <th>Days Worked</th>
+                            <th>Avg Hours/Day</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for employee in squad.employees %}
+                            <tr>
+                                <td>{{ employee.name }}</td>
+                                <td>{{ employee_totals[employee.id]['hours'] }}</td>
+                                <td>{{ employee_totals[employee.id]['days'] }}</td>
+                                <td>{{ "%.2f"|format(employee_totals[employee.id]['hours'] / employee_totals[employee.id]['days'] if employee_totals[employee.id]['days'] > 0 else 0) }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+                {% if report_format == 'detailed' %}
+                    {% for employee in squad.employees %}
+                        <div class="section">
+                            <div class="section-title">{{ employee.name }} - Detailed Records</div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Clock In</th>
+                                        <th>Clock Out</th>
+                                        <th>Hours</th>
+                                        <th>Location In</th>
+                                        <th>Location Out</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for record in employee_records[employee.id] %}
+                                        <tr>
+                                            <td>{{ record.clock_in.strftime('%m/%d/%Y') }}</td>
+                                            <td>{{ record.clock_in.strftime('%I:%M %p') }}</td>
+                                            <td>{{ record.clock_out.strftime('%I:%M %p') if record.clock_out else 'N/A' }}</td>
+                                            <td>{{ record.hours_worked() }}</td>
+                                            <td>{{ record.location_in.split('\n')[0] }}</td>
+                                            <td>{{ record.location_out.split('\n')[0] if record.location_out else 'N/A' }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    <tr class="total-row">
+                                        <td colspan="3">Total</td>
+                                        <td>{{ employee_totals[employee.id]['hours'] }}</td>
+                                        <td colspan="2"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if report_type == 'employee' and single_employee %}
+        <div class="section">
+            <div class="section-title">{{ single_employee.name }}{% if single_employee.squad %} - {{ single_employee.squad.name }} Squad{% endif %}</div>
+            
+            <div class="summary-box">
+                <strong>Employee Summary:</strong>
+                <ul>
+                    <li>Total Hours: <span class="summary-value">{{ employee_totals[single_employee.id]['hours'] }}</span></li>
+                    <li>Days Worked: <span class="summary-value">{{ employee_totals[single_employee.id]['days'] }}</span></li>
+                    <li>Average Hours/Day: <span class="summary-value">{{ "%.2f"|format(employee_totals[single_employee.id]['hours'] / employee_totals[single_employee.id]['days'] if employee_totals[single_employee.id]['days'] > 0 else 0) }}</span></li>
+                </ul>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Clock In</th>
+                        <th>Clock Out</th>
+                        <th>Hours</th>
+                        <th>Location In</th>
+                        <th>Location Out</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in employee_records[single_employee.id] %}
+                        <tr>
+                            <td>{{ record.clock_in.strftime('%m/%d/%Y') }}</td>
+                            <td>{{ record.clock_in.strftime('%I:%M %p') }}</td>
+                            <td>{{ record.clock_out.strftime('%I:%M %p') if record.clock_out else 'N/A' }}</td>
+                            <td>{{ record.hours_worked() }}</td>
+                            <td>{{ record.location_in.split('\n')[0] }}</td>
+                            <td>{{ record.location_out.split('\n')[0] if record.location_out else 'N/A' }}</td>
+                        </tr>
+                    {% endfor %}
+                    <tr class="total-row">
+                        <td colspan="3">Total</td>
+                        <td>{{ employee_totals[single_employee.id]['hours'] }}</td>
+                        <td colspan="2"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+    <div class="footer">
+        <p>Generated on {{ now.strftime('%B %d, %Y at %I:%M %p') }} | Alpha Employee Tracker</p>
+    </div>
+</body>
+</html>

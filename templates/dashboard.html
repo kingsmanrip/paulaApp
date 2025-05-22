@@ -10,6 +10,23 @@
     </div>
 </div>
 
+{% if insights %}
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card border-left-info">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-lightbulb text-info"></i> Insights</h5>
+                <ul class="mb-0">
+                    {% for insight in insights %}
+                    <li>{{ insight }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 {% for squad in squads %}
 <div class="row mt-4">
     <div class="col-12">
@@ -28,8 +45,8 @@
             </div>
             <div class="card-body">
                 <div class="mb-3">
-                    <h5 class="mb-2">Today:</h5>
-                    {% set today_hours = calculate_total_hours(employee, today, today) %}
+                    <h5 class="mb-2">{% if latest_workday == today %}Today{% else %}Latest ({{ latest_workday.strftime('%m/%d') }}){% endif %}:</h5>
+                    {% set today_hours = calculate_total_hours(employee, latest_workday, latest_workday) %}
                     <h3 class="text-primary">{{ today_hours }} hours</h3>
                 </div>
                 <div class="mb-3">
@@ -56,10 +73,10 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="summary-data">
-                            <span class="summary-label">Today's Hours:</span>
+                            <span class="summary-label">{% if latest_workday == today %}Today's Hours{% else %}Latest Day ({{ latest_workday.strftime('%m/%d') }}){% endif %}:</span>
                             {% set squad_today_hours = 0 %}
                             {% for employee in squad.employees %}
-                                {% set today_hours = calculate_total_hours(employee, today, today) %}
+                                {% set today_hours = calculate_total_hours(employee, latest_workday, latest_workday) %}
                                 {% set squad_today_hours = squad_today_hours + today_hours %}
                             {% endfor %}
                             <span class="summary-value">{{ squad_today_hours }} hours</span>
@@ -109,8 +126,8 @@
             </div>
             <div class="card-body">
                 <div class="mb-3">
-                    <h5 class="mb-2">Today:</h5>
-                    {% set today_hours = calculate_total_hours(employee, today, today) %}
+                    <h5 class="mb-2">{% if latest_workday == today %}Today{% else %}Latest ({{ latest_workday.strftime('%m/%d') }}){% endif %}:</h5>
+                    {% set today_hours = calculate_total_hours(employee, latest_workday, latest_workday) %}
                     <h3 class="text-primary">{{ today_hours }} hours</h3>
                 </div>
                 <div class="mb-3">
@@ -138,10 +155,10 @@
                 <div class="row">
                     <div class="col-md-3">
                         <div class="summary-card">
-                            <h3>Total Hours Today</h3>
+                            <h3>{% if latest_workday == today %}Today's Hours{% else %}Latest Day ({{ latest_workday.strftime('%m/%d') }}){% endif %}</h3>
                             {% set team_today_hours = 0 %}
                             {% for employee in employees %}
-                                {% set today_hours = calculate_total_hours(employee, today, today) %}
+                                {% set today_hours = calculate_total_hours(employee, latest_workday, latest_workday) %}
                                 {% set team_today_hours = team_today_hours + today_hours %}
                             {% endfor %}
                             <div class="number">{{ team_today_hours }} hours</div>
