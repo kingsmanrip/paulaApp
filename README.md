@@ -75,6 +75,22 @@ The Analytics page provides comprehensive performance metrics and visualizations
 
 Insights are automatically generated based on employee data and provide actionable intelligence for management decisions.
 
+## Latest Time Records
+
+As of May 23, 2025, the system includes the latest time records for the primary teams:
+
+### May 22, 2025
+
+**Employee1 Squad (601-434-7661)**
+- Clock In: 8:25 AM at 571 Simpson Hwy 149, Magee MS
+- Clock Out: 4:35 PM at 149 Simpson Hwy 149, Magee MS
+- Full team attendance: Caleb Bryant, Aaron Mitchell, Seth James, Colton Poore, David Pool, Shawn Beard
+
+**Employee8 Squad (601-610-2944)**
+- Clock In: 10:15 AM at 615-699 Cherry St NW, Magee MS
+- Clock Out: 5:47 PM at Evelyn Gandy Pkwy, Hattiesburg MS
+- Team members: Jeramy Smith, Johnnie Roberts, Blake Hay (no clock-out), Maurilio Galvez, Rodolfo Coronado
+
 ## Bulk Import Format
 
 ```
