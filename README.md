@@ -77,7 +77,21 @@ Insights are automatically generated based on employee data and provide actionab
 
 ## Latest Time Records
 
-As of May 23, 2025, the system includes the latest time records for the primary teams:
+As of May 24, 2025, the system includes the latest time records for the primary teams:
+
+### May 23, 2025
+
+**Magee Team (Partial Employee1 Squad)**
+- Clock In: 7:51 AM at 642 Ninth Ave NW, Magee MS 39111
+- Clock Out: 2:18 PM at 201-299 Dolly Ln NW, Magee MS 39111
+- Team members: Caleb Bryant, Colton Poore, Shawn Beard
+- Hours worked: 6 hours 27 minutes
+
+**Meridian Team (Partial Employee8 Squad)**
+- Clock In: 8:46 AM at 3453 Grandview Ave, Meridian MS 39305
+- Clock Out: 12:09 PM at I-20 W, Meridian MS 39307
+- Team members: Jeramy Smith, Blake Hay, Maurilio Galvez
+- Hours worked: 3 hours 23 minutes
 
 ### May 22, 2025
 
