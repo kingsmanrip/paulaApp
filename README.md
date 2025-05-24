@@ -77,7 +77,16 @@ Insights are automatically generated based on employee data and provide actionab
 
 ## Latest Time Records
 
-As of May 24, 2025, the system includes the latest time records for the primary teams:
+As of May 24, 2025, the system includes the latest time records for the primary teams. Note how individual employee hours are tracked regardless of which squad they work with on a given day:
+
+### May 24, 2025 - Employee7 Squad First Day
+
+**Forest MS Team (Cross-Squad Collaboration)**
+- Clock In: 8:46 AM at 10679 MS-35, Forest MS 39074
+- Clock Out: 5:30 PM at 4079-4205 MS-35, Forest MS 39074
+- Team members: Caleb Bryant (Employee1), Rene Rivas, Jaime Garcia, Willy Galvez, Antonio Jimenez, Reynaldo Martinez, Maurilio Galvez
+- Hours worked: 8 hours 44 minutes
+- Special note: First day for Employee7 squad with Caleb Bryant (Employee1) providing supervision/training
 
 ### May 23, 2025
 
