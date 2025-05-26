@@ -77,7 +77,15 @@ Insights are automatically generated based on employee data and provide actionab
 
 ## Latest Time Records
 
-As of May 24, 2025, the system includes the latest time records for the primary teams. Note how individual employee hours are tracked regardless of which squad they work with on a given day:
+As of May 26, 2025, the system includes the latest time records for the primary teams. Note how individual employee hours are tracked regardless of which squad they work with on a given day:
+
+### May 26, 2025 - Marion MS Team
+
+**Marion MS Team**
+- Clock In: 8:03 AM at 5449-5491 Fairground Dr, Marion MS 39342
+- Clock Out: 1:02 PM at 5449-5491 Fairground Dr, Marion MS 39342
+- Team members: James Jarrell, Thomas King, Seth Pope, Kyzer Revette, Richard Carter, Rodolfo Coronado
+- Hours worked: 4 hours 59 minutes
 
 ### May 24, 2025 - Employee7 Squad First Day
 
@@ -101,6 +109,14 @@ As of May 24, 2025, the system includes the latest time records for the primary 
 - Clock Out: 12:09 PM at I-20 W, Meridian MS 39307
 - Team members: Jeramy Smith, Blake Hay, Maurilio Galvez
 - Hours worked: 3 hours 23 minutes
+
+### May 18, 2025 - Hattiesburg Visit
+
+**Hattiesburg Team**
+- Clock In: 7:15 PM at Midtown Market Wine & Spirits, 3708 Hardy St, Hattiesburg MS 39402
+- Clock Out: 7:15 PM at Midtown Market Wine & Spirits, 3708 Hardy St, Hattiesburg MS 39402
+- Team members: James Jarrell, Thomas King
+- Note: Clock-in and clock-out times are identical - likely a brief site visit
 
 ### May 22, 2025
 
