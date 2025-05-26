@@ -110,14 +110,6 @@ As of May 26, 2025, the system includes the latest time records for the primary 
 - Team members: Jeramy Smith, Blake Hay, Maurilio Galvez
 - Hours worked: 3 hours 23 minutes
 
-### May 18, 2025 - Hattiesburg Visit
-
-**Hattiesburg Team**
-- Clock In: 7:15 PM at Midtown Market Wine & Spirits, 3708 Hardy St, Hattiesburg MS 39402
-- Clock Out: 7:15 PM at Midtown Market Wine & Spirits, 3708 Hardy St, Hattiesburg MS 39402
-- Team members: James Jarrell, Thomas King
-- Note: Clock-in and clock-out times are identical - likely a brief site visit
-
 ### May 22, 2025
 
 **Employee1 Squad (601-434-7661)**
