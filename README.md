@@ -79,13 +79,19 @@ Insights are automatically generated based on employee data and provide actionab
 
 As of May 26, 2025, the system includes the latest time records for the primary teams. Note how individual employee hours are tracked regardless of which squad they work with on a given day:
 
-### May 26, 2025 - Marion MS Team
+### May 26, 2025 - Multiple Teams
 
 **Marion MS Team**
 - Clock In: 8:03 AM at 5449-5491 Fairground Dr, Marion MS 39342
 - Clock Out: 1:02 PM at 5449-5491 Fairground Dr, Marion MS 39342
 - Team members: James Jarrell, Thomas King, Seth Pope, Kyzer Revette, Richard Carter, Rodolfo Coronado
 - Hours worked: 4 hours 59 minutes
+
+**Forest-to-Hattiesburg Team**
+- Clock In: 8:51 AM at 11065 MS-35, Forest MS 39074
+- Clock Out: 6:51 PM at 85 Indian Ridge Rd, Hattiesburg MS 39401
+- Team members: Willy Galvez, Eliseo Galvez
+- Hours worked: 10 hours 0 minutes
 
 ### May 24, 2025 - Employee7 Squad First Day
 
