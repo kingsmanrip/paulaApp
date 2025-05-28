@@ -79,6 +79,13 @@ Insights are automatically generated based on employee data and provide actionab
 
 As of May 26, 2025, the system includes the latest time records for the primary teams. Note how individual employee hours are tracked regardless of which squad they work with on a given day:
 
+### May 28, 2025 - Full Teams Back in Action
+
+**Multiple Teams Across Mississippi**
+- 6 teams working across different locations in Mississippi
+- 33 employees in total logged hours today
+- Teams in Meridian, Osyka, Magee, and Marion
+
 ### May 27, 2025 - No Activity
 
 **Weather Event**
