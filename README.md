@@ -79,6 +79,13 @@ Insights are automatically generated based on employee data and provide actionab
 
 As of May 26, 2025, the system includes the latest time records for the primary teams. Note how individual employee hours are tracked regardless of which squad they work with on a given day:
 
+### May 27, 2025 - No Activity
+
+**Weather Event**
+- All work stopped due to heavy rainfall
+- No time records for this date
+- Safety precaution to avoid hazardous conditions
+
 ### May 26, 2025 - Multiple Teams
 
 **Marion MS Team**
