@@ -79,6 +79,16 @@ Insights are automatically generated based on employee data and provide actionab
 
 As of May 26, 2025, the system includes the latest time records for the primary teams. Note how individual employee hours are tracked regardless of which squad they work with on a given day:
 
+### May 30, 2025 - Six Teams in the Field
+
+**Complete Time Records**
+- Six full teams operating across Mississippi
+- 34 employees clocked in at various locations
+- 33 employees completed both clock-in and clock-out
+- One employee (Antonio Jimenez) clocked in but did not clock out
+- Teams operating in Meridian, Osyka, and Magee
+- Half-day schedule for Caleb Bryant and James Jarrell's teams
+
 ### May 28, 2025 - Full Teams Back in Action
 
 **Multiple Teams Across Mississippi**
