@@ -39,14 +39,13 @@ A comprehensive web-based application for tracking employee attendance, work hou
 
 Employees are organized into squads for better team management, with each squad identified by a phone number:
 
-- **Employee1 (601-434-7661)**: Core field team including Caleb Bryant, Aaron Mitchell, Seth James, Colton Poore, David Pool, and Shawn Beard
-- **Employee2 (601-610-2935)**: Team members assigned to this squad
-- **Employee3 (601-610-2936)**: Team members assigned to this squad
-- **Employee4 (601-610-2933)**: Team members assigned to this squad
-- **Employee5 (601-610-2937)**: Team members assigned to this squad
-- **Employee6 (601-610-2938)**: Team members assigned to this squad
-- **Employee7 (601-610-2931)**: Team members assigned to this squad
-- **Employee8 (601-610-2944)**: Secondary team including Jeramy Smith, Johnnie Roberts, Blake Hay, and Maurilio Galvez
+- **Employee1 (601-434-7661)**: Caleb Bryant's team including Aaron Mitchell, Seth James, Colton Poore, David Pool, and Shawn Beard
+- **Employee2 - Secretary (601-610-2935)**: Fatima Gonzalez (Company Secretary)
+- **Employee3 (601-610-2936)**: James Jarrell's team including Thomas King, Seth Pope, Kyzer Revette, and Richard Carter
+- **Employee4 (601-610-2933)**: Joseph Mcswain's team including Jorge Rodas, Daniel Velez, Carlos Guevara, Luis Amador, and Julio Funes
+- **Employee5 (601-610-2937)**: Taiwan Brown's team including Oscar Hernandez, Luis Velasquez, Hector Hernandez, and Ignacio Antonio
+- **Employee7 (601-610-2931)**: Cristian Pérez's team including Yovanis Diaz, Rene Rivas, Jaime Garcia, Willy Galvez, Eliseo Galvez, Antonio Jimenez, and Reynaldo Martinez
+- **Employee8 (601-610-2944)**: Johnnie Roberts' team including Jeramy Smith, Blake Hay, Maurilio Galvez, and Rodolfo Coronado
 
 ### Squad Leadership
 
@@ -216,3 +215,58 @@ sudo systemctl start employee-tracker
 - Nginx (for production)
 - WeasyPrint dependencies (for PDF generation)
 - Modern web browser
+
+## Automated Database Backup
+
+The system includes an automated daily database backup process:
+
+- **Schedule**: Backups run automatically every day at 11:00 PM
+- **Location**: All backups are stored in `/root/employee_tracker/db_save_folder/`
+- **Naming**: Backup files follow the format `employee_tracker_backup_YYYYMMDD_HHMMSS.db`
+- **Log File**: The backup process logs activities to `/root/employee_tracker/db_save_folder/backup.log`
+
+### Manual Backup
+
+To trigger a manual backup at any time:
+
+```bash
+cd /root/employee_tracker
+python3 db_backup.py
+```
+
+## SFTP Upload System
+
+The system supports automated processing of time records via SFTP uploads:
+
+- **Upload Directory**: `/root/employee_tracker/uploads/time_records/`
+- **Processor**: A background service monitors the directory for new files 24/7
+- **Format**: Text files containing clock-in and clock-out data in standard format
+- **Processing**: Upon upload, records are automatically parsed and entered into the database
+- **History**: Processed files are moved to `/root/employee_tracker/uploads/processed/` with timestamps
+
+### Upload Format Requirements
+
+```
+ClockIn-
+employee:
+[Employee Names]
+location:
+[Location]
+date:
+[Date and Time]
+ClockOut-
+employee:
+[Employee Names]
+location:
+[Location]
+date:
+[Date and Time]
+```
+
+### iPhone Integration
+
+The SFTP upload system can be integrated with iPhone Shortcuts:
+1. Create a shortcut that processes SMS messages containing time records
+2. Use the "Save File" action with SFTP to upload the content to the server
+3. Configure connection details for the server (Host: 178.16.142.169, Path: /root/employee_tracker/uploads/time_records/)
+4. The system then automatically processes the uploaded file without manual intervention
