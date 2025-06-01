@@ -6,7 +6,24 @@
 <div class="row mt-4">
     <div class="col-12">
         <h1>Employee Dashboard</h1>
-        <p class="text-muted">Week of {{ start_of_week.strftime('%B %d, %Y') }} to {{ end_of_week.strftime('%B %d, %Y') }}</p>
+        <div class="d-flex justify-content-between align-items-center">
+            <p class="text-muted mb-0">Week of {{ start_of_week.strftime('%B %d, %Y') }} to {{ end_of_week.strftime('%B %d, %Y') }}</p>
+            <div class="btn-group">
+                <a href="{{ url_for('dashboard', week_date=prev_week) }}" class="btn btn-outline-primary">
+                    <i class="fas fa-chevron-left"></i> Previous Week
+                </a>
+                {% if not is_current_week %}
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Current Week</a>
+                {% endif %}
+                {% if next_week %}
+                <a href="{{ url_for('dashboard', week_date=next_week) }}" class="btn btn-outline-primary">
+                    Next Week <i class="fas fa-chevron-right"></i>
+                </a>
+                {% else %}
+                <button class="btn btn-outline-primary" disabled>Next Week <i class="fas fa-chevron-right"></i></button>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </div>
 
@@ -42,8 +59,15 @@
             </div>
             <div class="card-body">
                 <div class="mb-3">
-                    <h5 class="mb-2">{% if latest_workday == today %}Today{% else %}Latest ({{ latest_workday.strftime('%m/%d') }}){% endif %}:</h5>
-                    {% set today_hours = calculate_total_hours(employee, latest_workday, latest_workday) %}
+                    {% if is_current_week %}
+                        <h5 class="mb-2">{% if latest_workday == today %}Today{% else %}Latest ({{ latest_workday.strftime('%m/%d') }}){% endif %}:</h5>
+                        {% set today_hours = calculate_total_hours(employee, latest_workday, latest_workday) %}
+                    {% else %}
+                        <h5 class="mb-2">Daily Avg:</h5>
+                        {% set weekday_count = 5 %}  <!-- Assume 5 workdays per week -->
+                        {% set week_total = calculate_total_hours(employee, start_of_week, end_of_week) %}
+                        {% set today_hours = (week_total / weekday_count)|round(2) if week_total > 0 else 0 %}
+                    {% endif %}
                     <h3 class="text-primary">{{ today_hours }} hours</h3>
                 </div>
                 <div class="mb-3">
@@ -61,22 +85,24 @@
     </div>
     {% endfor %}
 </div>
-
-
 {% endfor %}
 
-<!-- Unassigned employees section (if any) -->
-{% set unassigned_employees = employees|selectattr('squad_id', 'none')|list %}
-{% if unassigned_employees|length > 0 %}
+<!-- Show unassigned employees if any exist -->
+{% set unassigned = [] %}
+{% for employee in employees if not employee.squad_id %}
+    {% do unassigned.append(employee) %}
+{% endfor %}
+
+{% if unassigned %}
 <div class="row mt-4">
     <div class="col-12">
-        <h2 class="squad-name">Unassigned Employees</h2>
-        <hr class="squad-divider">
+        <h2>Unassigned Employees</h2>
+        <hr>
     </div>
 </div>
 
 <div class="row">
-    {% for employee in unassigned_employees %}
+    {% for employee in unassigned %}
     <div class="col-md-6 col-lg-4">
         <div class="card employee-card">
             <div class="card-header d-flex justify-content-between align-items-center">
@@ -85,8 +111,15 @@
             </div>
             <div class="card-body">
                 <div class="mb-3">
-                    <h5 class="mb-2">{% if latest_workday == today %}Today{% else %}Latest ({{ latest_workday.strftime('%m/%d') }}){% endif %}:</h5>
-                    {% set today_hours = calculate_total_hours(employee, latest_workday, latest_workday) %}
+                    {% if is_current_week %}
+                        <h5 class="mb-2">{% if latest_workday == today %}Today{% else %}Latest ({{ latest_workday.strftime('%m/%d') }}){% endif %}:</h5>
+                        {% set today_hours = calculate_total_hours(employee, latest_workday, latest_workday) %}
+                    {% else %}
+                        <h5 class="mb-2">Daily Avg:</h5>
+                        {% set weekday_count = 5 %}  <!-- Assume 5 workdays per week -->
+                        {% set week_total = calculate_total_hours(employee, start_of_week, end_of_week) %}
+                        {% set today_hours = (week_total / weekday_count)|round(2) if week_total > 0 else 0 %}
+                    {% endif %}
                     <h3 class="text-primary">{{ today_hours }} hours</h3>
                 </div>
                 <div class="mb-3">
@@ -106,5 +139,13 @@
 </div>
 {% endif %}
 
-<!-- Company Summary section removed as requested -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-end">
+            <a href="{{ url_for('add_employee') }}" class="btn btn-primary me-2">Add Employee</a>
+            <a href="{{ url_for('add_record') }}" class="btn btn-success me-2">Add Record</a>
+            <a href="{{ url_for('bulk_import') }}" class="btn btn-info">Bulk Import</a>
+        </div>
+    </div>
+</div>
 {% endblock %}

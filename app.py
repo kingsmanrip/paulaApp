@@ -99,14 +99,26 @@ def logout():
     return redirect(url_for('login'))
 
 @app.route('/dashboard')
+@app.route('/dashboard/<string:week_date>')
 @login_required
-def dashboard():
+def dashboard(week_date=None):
     employees = Employee.query.all()
     squads = Squad.query.all()
     today = datetime.now().date()
     
-    # Get date range for current week (Monday to Sunday)
-    start_of_week = today - timedelta(days=today.weekday())
+    # Get date range for specified week or current week (Monday to Sunday)
+    if week_date:
+        try:
+            # Parse the date from the URL parameter
+            selected_date = datetime.strptime(week_date, '%Y-%m-%d').date()
+        except ValueError:
+            # If invalid date format, default to today
+            selected_date = today
+    else:
+        selected_date = today
+        
+    # Calculate the Monday and Sunday for the selected week
+    start_of_week = selected_date - timedelta(days=selected_date.weekday())
     end_of_week = start_of_week + timedelta(days=6)
     
     # Get the latest day with time records
@@ -179,6 +191,15 @@ def dashboard():
         insights.append(f"Unusual work patterns detected: {unusual_patterns[0]}" + 
                        (" and others" if len(unusual_patterns) > 1 else ""))
     
+    # Calculate previous and next week dates for navigation
+    prev_week = (start_of_week - timedelta(days=7)).strftime('%Y-%m-%d')
+    next_week = (start_of_week + timedelta(days=7)).strftime('%Y-%m-%d')
+    
+    # Don't allow navigation to future weeks past the current week
+    current_week_start = today - timedelta(days=today.weekday())
+    if start_of_week >= current_week_start:
+        next_week = None
+    
     return render_template('dashboard.html', 
                           employees=employees, 
                           calculate_total_hours=calculate_total_hours,
@@ -187,7 +208,10 @@ def dashboard():
                           insights=insights,
                           latest_workday=latest_workday,
                           start_of_week=start_of_week,
-                          end_of_week=end_of_week)
+                          end_of_week=end_of_week,
+                          prev_week=prev_week,
+                          next_week=next_week,
+                          is_current_week=(start_of_week == current_week_start))
 
 @app.route('/employee/<int:employee_id>')
 @login_required

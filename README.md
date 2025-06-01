@@ -26,14 +26,15 @@ A comprehensive web-based application for tracking employee attendance, work hou
 ## How to Use
 
 1. **Dashboard**: View squads and employees' work hours with assigned squad leaders
-2. **Squad Overview**: See employees grouped by squads with phone numbers
-3. **Squad Leader Management**: Assign or change squad leaders using the button next to each squad name
-4. **Employee Details**: Click on "Details" for any employee to see their complete work history
-5. **Add Employee**: Add new employees to the system
-6. **Add Record**: Manually add clock in/out records for employees
-7. **Bulk Import**: Paste formatted data to import multiple clock in/out records at once
-8. **Reports**: Generate PDF reports of employee hours for specific date ranges
-9. **Analytics**: Access the analytics dashboard for visual performance metrics and insights
+2. **Week Navigation**: Navigate between weeks to view historical employee hours data
+3. **Squad Overview**: See employees grouped by squads with phone numbers
+4. **Squad Leader Management**: Assign or change squad leaders using the button next to each squad name
+5. **Employee Details**: Click on "Details" for any employee to see their complete work history
+6. **Add Employee**: Add new employees to the system
+7. **Add Record**: Manually add clock in/out records for employees
+8. **Bulk Import**: Paste formatted data to import multiple clock in/out records at once
+9. **Reports**: Generate PDF reports of employee hours for specific date ranges
+10. **Analytics**: Access the analytics dashboard for visual performance metrics and insights
 
 ## Squad Organization
 
@@ -57,10 +58,19 @@ Each squad can have an assigned squad leader:
 ### Employee Performance Tracking
 
 Each employee card displays:
-- Latest day's hours
-- Weekly hours
-- Total hours worked
+- Latest day's hours (or daily average for past weeks)
+- Weekly hours for the selected time period
+- Total hours worked overall
 - Access to detailed performance history
+
+### Week Navigation
+
+The dashboard includes a week navigation system that allows:
+- Viewing data for any previous week
+- Comparing weekly performance over time
+- One-click return to current week
+- Easy traversal through historical data
+- Daily average calculations for past weeks
 
 ## Analytics and Insights
 
