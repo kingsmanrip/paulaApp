@@ -88,12 +88,9 @@
 {% endfor %}
 
 <!-- Show unassigned employees if any exist -->
-{% set unassigned = [] %}
-{% for employee in employees if not employee.squad_id %}
-    {% do unassigned.append(employee) %}
-{% endfor %}
 
-{% if unassigned %}
+<!-- Instead of using the do tag, filter directly in the next section -->
+{% if employees|selectattr('squad_id', 'none')|list %}
 <div class="row mt-4">
     <div class="col-12">
         <h2>Unassigned Employees</h2>
@@ -102,7 +99,7 @@
 </div>
 
 <div class="row">
-    {% for employee in unassigned %}
+    {% for employee in employees if not employee.squad_id %}
     <div class="col-md-6 col-lg-4">
         <div class="card employee-card">
             <div class="card-header d-flex justify-content-between align-items-center">
