@@ -1,0 +1,47 @@
+ClockIn- employee: Joseph Mcswain Jorge Rodas Daniel Velez Carlos Guevara Luis Amador Julio Funes
+location: 3330 28th Ave Meridian MS 39305 Estados Unidos
+date: jun 2, 2025, 7:27 a.m.
+
+ClockIn- employee: Blake Hay Oscar Hernandez Luis Velasquez Hector Hernandez Ignacio Antonio Jaime Garcia
+location: 3930 Poplar Springs Dr Meridian MS 39305 Estados Unidos
+date: jun 2, 2025, 7:40 a.m.
+
+ClockIn- employee: James Jarrell Thomas King Kyzer Revette Richard Carter
+location: 5401 Marion Dr Marion MS 39342 United States
+date: Jun 2, 2025 at 7:42 AM
+
+ClockIn- employee: Cristian Pérez Yovanis Diaz Willy Galvez Antonio Jimenez Reynaldo Martinez
+location: 333 W Amite St Osyka MS 39657 Estados Unidos
+date: jun 2, 2025, 8:01 a.m.
+
+ClockIn- employee: Caleb Bryant Aaron Mitchell Seth James Colton Poore David Pool Shawn Beard
+location: 479 Simpson Hwy 149 Magee MS 39111 United States
+date: Jun 2, 2025 at 8:21 AM
+
+ClockIn- employee: Jeramy Smith Johnnie Roberts Maurilio Galvez Rodolfo Coronado
+location: 529 Elm Ave NW Magee MS 39111 United States
+date: Jun 2, 2025 at 8:50 AM
+
+ClockOut- employee: Blake Hay Oscar Hernandez Luis Velasquez Hector Hernandez Ignacio Antonio Jaime Garcia
+location: 2725 40th St Meridian MS 39305 Estados Unidos
+date: jun 2, 2025, 3:30 p.m.
+
+ClockOut- employee: Cristian Pérez Yovanis Diaz Willy Galvez Antonio Jimenez Reynaldo Martinez
+location: E Liberty St Osyka MS 39657 Estados Unidos
+date: jun 2, 2025, 3:55 p.m.
+
+ClockOut- employee: Joseph Mcswain Jorge Rodas Daniel Velez Carlos Guevara Luis Amador Julio Funes
+location: 29th Ave Meridian MS 39301 Estados Unidos
+date: jun 2, 2025, 3:58 p.m.
+
+ClockOut- employee: Jeramy Smith Johnnie Roberts Maurilio Galvez Rodolfo Coronado
+location: 521 Elm Ave NW Magee MS 39111 United States
+date: Jun 2, 2025 at 4:03 PM
+
+ClockOut- employee: Caleb Bryant Aaron Mitchell Seth James Colton Poore David Pool Shawn Beard
+location: 642 Ninth Ave NW Magee MS 39111 United States
+date: Jun 2, 2025 at 4:28 PM
+
+ClockOut- employee: James Jarrell Thomas King Kyzer Revette Richard Carter
+location: 820–844 NE Industrial Park Rd Marion MS 39342 United States
+date: Jun 2, 2025 at 4:39 PM
